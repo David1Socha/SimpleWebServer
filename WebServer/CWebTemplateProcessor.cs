@@ -40,13 +40,7 @@ namespace WebServer
 
         public ScriptResult ProcessScript(Stream stream, IDictionary<string, string> requestParameters)
         {
-            StringBuilder scriptBuilder = new StringBuilder();
-            StreamReader reader = new StreamReader(stream);
-            while (!reader.EndOfStream)
-            {
-                scriptBuilder.Append(reader.ReadLine());
-            }
-            String script = scriptBuilder.ToString();
+            String script = _BuildScript(stream);
             return new ScriptResult()
             {
                 Result = script,
@@ -54,9 +48,21 @@ namespace WebServer
             };
         }
 
-        public static String ReplaceOutputLines(String script)
+        private static String _ReplaceOutputLines(String script)
         {
             return _OutputRegex.Replace(script, "{wout.WriteLine(${code});}");
+        }
+
+        private static String _BuildScript(Stream scriptStream)
+        {
+            StringBuilder scriptBuilder = new StringBuilder();
+            StreamReader reader = new StreamReader(scriptStream);
+            while (!reader.EndOfStream)
+            {
+                scriptBuilder.Append(reader.ReadLine());
+            }
+            String script = scriptBuilder.ToString();
+            return script;
         }
 
     }
