@@ -9,6 +9,13 @@ namespace WebServer
     class CWebTemplateProcessor
     {
 
+        private CSharpServerCodeExecutor _executor;
+
+        public CWebTemplateProcessor()
+        {
+            _executor = new CSharpServerCodeExecutor();
+        }
+
         private static int _FindClosingBracket(String str, int openingBracketIndex)
         {
             int leftRightDifference = 1;
