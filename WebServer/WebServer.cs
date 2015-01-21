@@ -30,6 +30,7 @@ namespace WebServer
     {
         private readonly string _webRoot;
         private IScriptProcessor _scriptProcessor;
+        private CWebTemplateProcessor _templateProcessor;
 
         static void Main(string[] args)
         {
@@ -54,8 +55,7 @@ namespace WebServer
              * csscript */
             _scriptProcessor = new CscriptProcessor();
 
-            /*TODO: add another instance of a IScriptProcessor to handle files of
-             * type csweb */
+            _templateProcessor = new CWebTemplateProcessor();
 
             /* set the root for the server */
             _webRoot = root;
@@ -167,7 +167,7 @@ namespace WebServer
                     }
                     else
                     {
-                        /* otherwise generate a Not Found (404) response */ 
+                        /* otherwise generate a Not Found (404) response */
                         _SendResponse(socket, new byte[0], null, ResponseType.NOT_FOUND);
                     }
                 }
@@ -202,15 +202,17 @@ namespace WebServer
                 /* this is a special case as the requested file needs to be executed and the 
                  * result of the execution returned as the response body rather than the 
                  * file itself */
-                case ".csscript": 
+                case ".csscript":
                     {
                         _GenerateScriptResult(socket, path, requestParameters);
                         return;
                     }
 
-                /* TODO: add another handler for processing web template files
-                 * case ".csweb": 
-                 */
+                case ".csweb":
+                    {
+                        _GenerateTemplateResult(socket, path, requestParameters);
+                        return;
+                    }
                 default:
                     type = "application/octet-stream";
                     break;
@@ -305,6 +307,24 @@ namespace WebServer
                 /* send a response with the results of the script evaluation */
                 _SendResponse(socket, Encoding.ASCII.GetBytes(result.Result), "text/html; charset=utf8", ResponseType.OK);
             }
+        }
+
+        private void _GenerateTemplateResult(Socket socket, string path, Dictionary<string, string> requestParameters)
+        {
+            ScriptResult result;
+            using (FileStream fs = File.OpenRead(path))
+            {
+                result = _templateProcessor.ProcessScript(fs, requestParameters);
+            }
+            if (result.Error)
+            {
+                _SendResponse(socket, Encoding.ASCII.GetBytes(result.Result), "text/html; charset=utf8", ResponseType.ERROR);
+            }
+            else
+            {
+                _SendResponse(socket, Encoding.ASCII.GetBytes(result.Result), "text/html; charset=utf8", ResponseType.OK);
+            }
+
         }
     }
 }
