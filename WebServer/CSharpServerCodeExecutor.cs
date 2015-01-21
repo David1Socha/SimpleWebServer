@@ -35,6 +35,11 @@ namespace WebServer
             _params.CompilerOptions = "/t:library";
         }
 
+        public static ScriptResult executeCode(String code)
+        {
+
+        }
+
         private static String _buildClassString(String code)
         {
             return String.Format(_classTemplate, code);
