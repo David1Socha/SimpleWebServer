@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WebServer
@@ -10,6 +11,7 @@ namespace WebServer
     class CWebTemplateProcessor : IScriptProcessor
     {
 
+        private const Regex _OutputRegex = new Regex("@{(?<code>[^}])*}"); //and now I have 2 problems..
         private CSharpServerCodeExecutor _executor;
 
         public CWebTemplateProcessor()
@@ -50,6 +52,11 @@ namespace WebServer
                 Result = script,
                 Error = true
             };
+        }
+
+        public static String ReplaceOutputLines(String script)
+        {
+            return _OutputRegex.Replace(script, "{wout.WriteLine(${code});}");
         }
 
     }
