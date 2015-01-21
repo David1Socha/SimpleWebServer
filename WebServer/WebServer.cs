@@ -204,13 +204,13 @@ namespace WebServer
                  * file itself */
                 case ".csscript":
                     {
-                        _GenerateScriptResult(socket, path, requestParameters);
+                        _GenerateScriptResult(socket, path, requestParameters, _scriptProcessor);
                         return;
                     }
 
                 case ".csweb":
                     {
-                        _GenerateTemplateResult(socket, path, requestParameters);
+                        _GenerateScriptResult(socket, path, requestParameters, _templateProcessor);
                         return;
                     }
                 default:
@@ -286,35 +286,13 @@ namespace WebServer
             }
         }
 
-        /* This method will process a script file and send the results as the 
-         * body of the response */
-        private void _GenerateScriptResult(Socket socket, string path, Dictionary<string, string> requestParameters)
-        {
-            /* get a script result from the scrupt processor using the request parameter dictionary */
-            ScriptResult result;
-            using (FileStream fs = File.OpenRead(path))
-            {
-                result = _scriptProcessor.ProcessScript(fs, requestParameters);
-            }
-            /* if the result was an error, send an HTTP Error (500) along wiht a summary of 
-             * what went wrong as the body */
-            if (result.Error)
-            {
-                _SendResponse(socket, Encoding.ASCII.GetBytes(result.Result), "text/html; charset=utf8", ResponseType.ERROR);
-            }
-            else
-            {
-                /* send a response with the results of the script evaluation */
-                _SendResponse(socket, Encoding.ASCII.GetBytes(result.Result), "text/html; charset=utf8", ResponseType.OK);
-            }
-        }
 
-        private void _GenerateTemplateResult(Socket socket, string path, Dictionary<string, string> requestParameters)
+        private void _GenerateScriptResult(Socket socket, string path, Dictionary<string, string> requestParameters, IScriptProcessor processor)
         {
             ScriptResult result;
             using (FileStream fs = File.OpenRead(path))
             {
-                result = _templateProcessor.ProcessScript(fs, requestParameters);
+                result = processor.ProcessScript(fs, requestParameters);
             }
             if (result.Error)
             {
@@ -324,7 +302,6 @@ namespace WebServer
             {
                 _SendResponse(socket, Encoding.ASCII.GetBytes(result.Result), "text/html; charset=utf8", ResponseType.OK);
             }
-
         }
     }
 }
