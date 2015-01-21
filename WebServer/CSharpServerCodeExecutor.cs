@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace WebServer
 {
-    class CSharpCodeExecutor
+    class CSharpServerCodeExecutor
     {
         private CSharpCodeProvider _provider;
         private CompilerParameters _params;
 
-        public CSharpCodeExecutor()
+        public CSharpServerCodeExecutor()
         {
             _provider = new CSharpCodeProvider();
             _params = new CompilerParameters();
