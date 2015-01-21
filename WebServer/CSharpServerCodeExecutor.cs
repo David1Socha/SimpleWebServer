@@ -13,6 +13,15 @@ namespace WebServer
         private CSharpCodeProvider _provider;
         private CompilerParameters _params;
 
+        private const string _classTemplate = "using System;" +
+    "namespace Server {" +
+        "public class Executor {" +
+            "public void Execute(System.IO.StringWriter wout, System.Collections.Generic.Dictionary<string, string> request) {" +
+                "{0}" +
+            "}" +
+        "}" +
+    "}";
+
         public CSharpServerCodeExecutor()
         {
             _provider = new CSharpCodeProvider();
@@ -20,6 +29,11 @@ namespace WebServer
             _params.ReferencedAssemblies.Add("system.dll");
             _params.GenerateInMemory = true;
             _params.CompilerOptions = "/t:library";
+        }
+
+        private static String _buildClassString(String code)
+        {
+            return String.Format(_classTemplate, code);
         }
 
     }
