@@ -20,7 +20,10 @@ namespace WebServer
                 "{0}" +
             "}" +
         "}" +
-    "}";
+    "}",
+                            _compilationErrorHeader = "<html><body><h1>Script Compilation Errors</h1><p>The following errors occurred processing the requested resource</p><ul>",
+                            _compilationErrorLine = "<li>{0}:{1} - Error: {2}</li>",
+                            _compilationErrorFooter = "</ul></body></html>";
 
         public CSharpServerCodeExecutor()
         {
@@ -34,6 +37,23 @@ namespace WebServer
         private static String _buildClassString(String code)
         {
             return String.Format(_classTemplate, code);
+        }
+
+        private static ScriptResult _buildCompilationErrorResponse(CompilerErrorCollection compilerErrors)
+        {
+            StringBuilder response = new StringBuilder();
+            response.Append(_compilationErrorHeader);
+            foreach (CompilerError e in compilerErrors)
+            {
+                String errorLine = String.Format(_compilationErrorLine, e.Line, e.Column, e.ErrorText);
+                response.Append(errorLine);
+            }
+            response.Append(_compilationErrorFooter);
+            return new ScriptResult()
+            {
+                Error = true,
+                Result = response.ToString()
+            };
         }
 
     }
