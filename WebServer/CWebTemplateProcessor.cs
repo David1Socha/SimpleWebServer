@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace WebServer
 {
-    class CWebTemplateProcessor
+    class CWebTemplateProcessor : IScriptProcessor
     {
 
         private CSharpServerCodeExecutor _executor;
@@ -33,6 +34,22 @@ namespace WebServer
                 }
             }
             return index;
+        }
+
+        public ScriptResult ProcessScript(Stream stream, IDictionary<string, string> requestParameters)
+        {
+            StringBuilder scriptBuilder = new StringBuilder();
+            StreamReader reader = new StreamReader(stream);
+            while (!reader.EndOfStream)
+            {
+                scriptBuilder.Append(reader.ReadLine());
+            }
+            String script = scriptBuilder.ToString();
+            return new ScriptResult()
+            {
+                Result = script,
+                Error = true
+            };
         }
 
     }
