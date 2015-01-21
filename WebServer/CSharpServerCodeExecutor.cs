@@ -23,7 +23,8 @@ namespace WebServer
     "}",
                             _compilationErrorHeader = "<html><body><h1>Script Compilation Errors</h1><p>The following errors occurred processing the requested resource</p><ul>",
                             _compilationErrorLine = "<li>{0}:{1} - Error: {2}</li>",
-                            _compilationErrorFooter = "</ul></body></html>";
+                            _compilationErrorFooter = "</ul></body></html>",
+                            _runtimeErrorMessage = "<html><body><h1>Runtime Error</h1><p>The following runtime error occurred: {0}</p>";
 
         public CSharpServerCodeExecutor()
         {
@@ -53,6 +54,16 @@ namespace WebServer
             {
                 Error = true,
                 Result = response.ToString()
+            };
+        }
+
+        private static ScriptResult _buildRuntimeErrorResponse(Exception runtimeException)
+        {
+            String response = String.Format(_runtimeErrorMessage, runtimeException.Message);
+            return new ScriptResult()
+            {
+                Error = true,
+                Result = response
             };
         }
 
