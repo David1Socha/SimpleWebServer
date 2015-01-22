@@ -11,7 +11,7 @@ namespace WebServer
     class CWebTemplateProcessor : IScriptProcessor
     {
 
-        private static Regex _OutputRegex = new Regex("@{(?<code>[^}])*}"); //and now I have 2 problems..
+        private static Regex _OutputRegex = new Regex("@{(?<code>[^}]*)}"); //and now I have 2 problems..
         private const String _WriteHtmlString = "wout.WriteLine(\"{0}\");",
                              _WriteCodeString = "{wout.WriteLine(${code});}";
         private CSharpServerCodeExecutor _executor;
@@ -64,6 +64,7 @@ namespace WebServer
                 {
                     String remainingHtml = script.Substring(i);
                     code.AppendFormat(_WriteHtmlString, remainingHtml);
+                    i = script.Length;
                 }
                 else
                 {
@@ -73,7 +74,7 @@ namespace WebServer
                         code.AppendFormat(_WriteHtmlString, htmlSoFar);
                     }
                     int closingIndex = _FindClosingBracket(script, openingIndex);
-                    if (openingIndex + 1 > closingIndex) //check if code exists inbetween brackets
+                    if (openingIndex + 1 < closingIndex) //check if code exists inbetween brackets
                     {
                         String codeInBrackets = script.Substring(openingIndex + 1, closingIndex - openingIndex - 1);
                         code.Append(codeInBrackets);
