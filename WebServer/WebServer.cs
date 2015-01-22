@@ -31,6 +31,7 @@ namespace WebServer
         private readonly string _webRoot;
         private IScriptProcessor _scriptProcessor;
         private CWebTemplateProcessor _templateProcessor;
+        private const string _DefaultFile = @"\index.html";
 
         static void Main(string[] args)
         {
@@ -129,47 +130,33 @@ namespace WebServer
                  */
                 string resource = header.Substring(4, header.IndexOf("HTTP") - 4).Trim();
 
-                /* If the root is being requested, send back a default web page stating
-                 * that this server doesn't support default documents or directory
-                 * listing. 
-                 * 
-                 * TODO: change this to support a default document (i.e. index.html) as
-                 * specified by the user. Such a default document should be able to 
-                 * reside at any level of the directory structure under web root. If
-                 * a default document doesn't exist, an HTTP Not Found response should
-                 * be returned
-                 */
                 if (resource.Equals("/"))
                 {
-                    string html = "<html><body><h1>Server Server v. 1.0</h1><p>Default pages aren't support, request a specific resources</p></body></html>";
-                    _SendResponse(socket, Encoding.UTF8.GetBytes(html), "text/html; charset=utf8", ResponseType.OK);
+                    resource = _DefaultFile;
+                }
+                /* if an actual resource was requested, append the webroot to it to transform 
+                 * the path to a system local path and parse the full path to separate the path
+                 * from the request variables */
+                resource = _BuildFullPath(resource);
+                string[] parts = resource.Split('?');
+                resource = parts[0]; // the resource is the first half of the path
+
+                /* the request variables are the second part of the path and these are loaded
+                 * into an IDictionary instance to be used later */
+                Dictionary<string, string> requestParameters = parts.Count() > 1 ? parts[1].Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(part => part.Split('='))
+                     .ToDictionary(split => split[0], split => split[1]) : new Dictionary<string, string>();
+
+                /* if the path is to a file that exists under the webroot directory, 
+                 * create an HTTP response with that file in the response body */
+                if (File.Exists(resource))
+                {
+                    _ProcessBody(socket, resource, requestParameters);
                 }
                 else
                 {
-                    /* if an actual resource was requested, append the webroot to it to transform 
-                     * the path to a system local path and parse the full path to separate the path
-                     * from the request variables */
-                    resource = _BuildFullPath(resource);
-                    string[] parts = resource.Split('?');
-                    resource = parts[0]; // the resource is the first half of the path
-
-                    /* the request variables are the second part of the path and these are loaded
-                     * into an IDictionary instance to be used later */
-                    Dictionary<string, string> requestParameters = parts.Count() > 1 ? parts[1].Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(part => part.Split('='))
-                         .ToDictionary(split => split[0], split => split[1]) : new Dictionary<string, string>();
-
-                    /* if the path is to a file that exists under the webroot directory, 
-                     * create an HTTP response with that file in the response body */
-                    if (File.Exists(resource))
-                    {
-                        _ProcessBody(socket, resource, requestParameters);
-                    }
-                    else
-                    {
-                        /* otherwise generate a Not Found (404) response */
-                        _SendResponse(socket, new byte[0], null, ResponseType.NOT_FOUND);
-                    }
+                    /* otherwise generate a Not Found (404) response */
+                    _SendResponse(socket, new byte[0], null, ResponseType.NOT_FOUND);
                 }
 
             }
