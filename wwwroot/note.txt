@@ -1,0 +1,1 @@
+This directory would reside on C:\wwwroot with the default server configuration
