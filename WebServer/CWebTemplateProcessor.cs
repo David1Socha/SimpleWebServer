@@ -64,6 +64,7 @@ namespace WebServer
                 {
                     String remainingHtml = script.Substring(i);
                     code.AppendFormat(_WriteHtmlString, remainingHtml);
+                    i = script.Length;
                 }
                 else
                 {
