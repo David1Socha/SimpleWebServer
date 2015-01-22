@@ -149,7 +149,7 @@ namespace WebServer
                     /* if an actual resource was requested, append the webroot to it to transform 
                      * the path to a system local path and parse the full path to separate the path
                      * from the request variables */
-                    resource = string.Format("{0}{1}", _webRoot, resource.Replace("/", @"\"));
+                    resource = _BuildFullPath(resource);
                     string[] parts = resource.Split('?');
                     resource = parts[0]; // the resource is the first half of the path
 
@@ -174,6 +174,12 @@ namespace WebServer
 
             }
             socket.Close(); // always make sure to close network and file handles!!
+        }
+
+        private String _BuildFullPath(String relativePath)
+        {
+            String fullPath = string.Format("{0}{1}", _webRoot, relativePath.Replace("/", @"\"));
+            return fullPath;
         }
 
         /* A method for processing the requested file to return to the client in a response body.
