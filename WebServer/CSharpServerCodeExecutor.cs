@@ -73,7 +73,7 @@ namespace WebServer
 
         private static String _BuildClassString(String code)
         {
-            return String.Format(_classTemplate, code);
+            return _classTemplate.Replace("{0}", code);
         }
 
         private static ScriptResult _BuildCompilationErrorResponse(CompilerErrorCollection compilerErrors)
