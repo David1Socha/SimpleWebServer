@@ -135,10 +135,6 @@ namespace WebServer
                  */
                 string resource = header.Substring(4, header.IndexOf("HTTP") - 4).Trim();
 
-                if (resource.Equals("/"))
-                {
-                    resource = _DefaultFile;
-                }
                 /* if an actual resource was requested, append the webroot to it to transform 
                  * the path to a system local path and parse the full path to separate the path
                  * from the request variables */
@@ -154,7 +150,12 @@ namespace WebServer
 
                 /* if the path is to a file that exists under the webroot directory, 
                  * create an HTTP response with that file in the response body */
-                if (File.Exists(resource))
+                if (Directory.Exists(resource))
+                {
+                    resource = resource + _DefaultFile;
+                    _ProcessBody(socket, resource, requestParameters);
+                }
+                else if (File.Exists(resource))
                 {
                     _ProcessBody(socket, resource, requestParameters);
                 }
