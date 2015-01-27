@@ -31,7 +31,8 @@ namespace WebServer
         private readonly string _webRoot;
         private IScriptProcessor _scriptProcessor;
         private CWebTemplateProcessor _templateProcessor;
-        private const string _DefaultFile = @"\index.html";
+        private const string _DefaultDefaultFile = @"\index.html";
+        private readonly string _DefaultFile;
 
         static void Main(string[] args)
         {
@@ -46,17 +47,21 @@ namespace WebServer
             /* if the user does not provide a web root, default to /wwwroot */
             string webRoot = args.Count() > 1 ? args[1] : @"C:\wwwroot";
 
+            String defaultFile = args.Count() > 2 ? args[2] : _DefaultDefaultFile;
+
             /* create an instance of the web server and start listening for requests */
-            new WebServer(port, webRoot);
+            new WebServer(port, webRoot, defaultFile);
         }
 
-        public WebServer(int port, string root)
+        public WebServer(int port, string root, string defaultFile)
         {
             /* this script processor instance will be used to process files of type 
              * csscript */
             _scriptProcessor = new CscriptProcessor();
 
             _templateProcessor = new CWebTemplateProcessor();
+
+            _DefaultFile = defaultFile;
 
             /* set the root for the server */
             _webRoot = root;
