@@ -271,7 +271,7 @@ namespace WebServer
              * Again, this is a very simple server so we don't implement much of the 
              * HTTP spec */
             response.Append(string.Format("Date: {0}\r\n", DateTime.Now.ToUniversalTime().ToString("ddd, dd MMM yyyy HH:mm:ss 'GMT'")));
-            response.Append("Server: Simple Web Server");
+            response.Append("Server: Simple Web Server\r\n");
             response.Append("Connection: Close\r\n\n");
 
             /* encode and send the header to the client */
