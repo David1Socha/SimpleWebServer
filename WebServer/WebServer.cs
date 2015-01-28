@@ -153,9 +153,8 @@ namespace WebServer
                 if (Directory.Exists(resource))
                 {
                     resource = resource + _DefaultFile;
-                    _ProcessBody(socket, resource, requestParameters);
                 }
-                else if (File.Exists(resource))
+                if (File.Exists(resource))
                 {
                     _ProcessBody(socket, resource, requestParameters);
                 }
